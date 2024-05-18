@@ -139,11 +139,48 @@ data_clear['Valido'], data_clear['Numero formateado'] = zip(*data_clear.apply(ve
 phone_validos = data_clear.groupby(by='Valido',dropna = False).agg(
     contantidad = ('Valido','count')).reset_index()
 data_clear =data_clear.rename(columns={'country_code':'countrycode'})
-#%% Procedemos a verificar las ciudades
-
+#%% Procedemos a verificar el formato de las direcciones
+from address_parser import Parser
+# Crear una instancia para acceder a los metodos de parser
+parser = Parser()
+# creando función para validar las direcciones
+def validar_direccion(address):
+    try:
+        # Analizar la dirección
+        parsed_address = parser.parse(address)
+        # Si se analiza correctamente, se considera válido
+        return parsed_address is not None
+    except Exception:
+        return False
+# procedemos a aplicar la funcion mediante el metodo apply
+data_clear['direccion valida']= data_clear['address'].apply(validar_direccion)
 
 #%% procedemos a armar el  dataframe limpio 
+# eliminando columnas que no voy a exportar
+data_clear_to_export=data_clear.drop(['direccion valida','Valido','Mensaje Dominio',
+                                      ''],axis=1)
 # seleccionando todas las filas donde Email valido y Valido sea igual a True
-microactividad_clear = data_clear[(data_clear['Email valido']== True) & (data_clear['Valido']== True)]
-
-data_clear=data_clear.drop('is_valid',axis=1)
+microactividad_clear = data_clear[(data_clear['Email valido']== True) & (data_clear['Valido']== True)
+                                  & (data_clear['direccion valida']== True)]
+#
+microactividad_clear=microactividad_clear.drop(['direccion valida','Valido','Mensaje Dominio',
+                                      'Email valido'],axis=1)
+# creando orden en que quiero que esten las columnas
+order_columnas =['id', 'first_name', 'last_name', 'email', 'phone','Numero formateado','address', 'city',
+       'country', 'countrycode']
+microactividad_clear = microactividad_clear[order_columnas]
+microactividad_clear.to_csv('microactividad_clear.csv', index=False,sep=',')
+#%% Procedemos a guardar los datosduplicados
+linea_duplicada.to_csv('microactividad_datos_duplicados.csv',index=False, sep=',')
+#%% Creando condición para extraer los datos que cumplen con ciertas condiciones
+condicion_valida = (data_clear['Email valido'] == True) & (data_clear['Valido'] == True) & (data_clear['direccion valida'] == True)
+# estrayendo los datos que no cumplen esa condición
+data_mala = data_clear[~condicion_valida]
+# eliminando columnas 
+data_mala=data_mala.drop(['Valido','direccion valida'],axis=1)
+# ordenando columnas
+order_columnas2 =['id', 'first_name', 'last_name', 'email','Email valido', 'Mensaje Dominio',
+                  'phone','Numero formateado','address', 'city',
+       'country', 'countrycode']
+data_mala = data_mala[order_columnas2]
+data_mala.to_csv('microactividad_datos_erroneos.csv',index=False, sep=',')
