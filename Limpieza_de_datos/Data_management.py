@@ -184,3 +184,39 @@ order_columnas2 =['id', 'first_name', 'last_name', 'email','Email valido', 'Mens
        'country', 'countrycode']
 data_mala = data_mala[order_columnas2]
 data_mala.to_csv('microactividad_datos_erroneos.csv',index=False, sep=',')
+#%% creando diccionario que contiene los resumenes de los datos encontrados
+resumen ={'Registros csv1':100,
+          'Registros csv2':100,
+          'Registros csv3':100,
+          'Total registros':300,
+          'Total registros faltantes':0,
+          'Phone validos':66,
+          'Phone invalidos':229,
+          'email validos':293,
+          'email invalidos':2,
+          'address valida':295,
+          'Total datos limpios':66,
+          'Total datos descartados':229,
+          'Duplicados':10,
+          'Duplicados elimidados':5}
+# resumen para grafico de barras 
+resumen_barras ={'Registros csv1':100,
+          'Registros csv2':100,
+          'Registros csv3':100,
+          'Total registros':300,
+          'Total registros faltantes':0,
+          'Phone válidos':66,
+          'Phone no válidos':229,
+          'Email válidos':293,
+          'Email no válidos':2,
+          'Address válida':295,
+          'Duplicados':10,
+          'Duplicados elimidados':5}
+# convirtindo a dataframe
+df_resumen = pd.DataFrame.from_dict(resumen, orient='index').transpose()
+df_resumen2 = pd.DataFrame(list(resumen_barras.items()), columns=['Descripción', 'Valor'])
+# exportando a csv
+df_resumen.to_csv('Resumen de datos procesado.csv', index= False, sep=',')
+# ordenando dataframe 2 de menor a mayor
+df_resumen2 = df_resumen2.sort_values(by='Valor')
+df_resumen2.to_csv('Resumen de datos procesado2.csv', index= False, sep=',')
