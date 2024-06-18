@@ -44,7 +44,7 @@ def verificar_smtp(email):
         server = smtplib.SMTP(timeout=10)
         # conectandose al servidor
         server.connect(mx_record)
-        # iniciamos conversación SMTP con servidor de corroe mediante el comando helo
+        # iniciamos conversación SMTP con servidor de corro mediante el comando helo
         server.helo(server.local_hostname)
         # realizando envio de correo electrónico desde un correo ficticio que no espera respuesta
         server.mail('noreply@example.com')
@@ -66,15 +66,15 @@ def validar_email_completo(email):
         domain = valid.domain
         # realizando segunda verificación mediante la funcion verificar_smtp
         if not verificar_smtp(email):
-            return False, "Correo no válido segun SMTP"
-        return True, "Correo válido segun SMTP"
+            return False, "Correo no válido según SMTP"
+        return True, "Correo válido según SMTP"
     
     except EmailNotValidError:
         # Si se encuentra discrepancia en el formato se devuleve 'invalido'
         return 'invalido', "Email con formato inválido."
 
-"""creando función que toma el la columna del dataframe que contiene los
-   correos electrónicos y los procesa utulizando la función validar_email_completo(email)
+"""creando función que toma la columna del dataframe que contiene los
+   correos electrónicos y los procesa utilizando la función validar_email_completo(email)
 """
 def procesar_email(email):
     # el asterico significa que validar_email_completo devuleve una tupla
