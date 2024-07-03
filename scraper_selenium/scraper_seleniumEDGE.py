@@ -36,20 +36,40 @@ driver.get(url)
         li
         a
 """
-#%% Procedemos a dar clic en los botones correspondiente a el equipo
+#%% Procedemos a dar clic en el boton correspondiente Ucrania
 # Esperar hasta que el botón esté presente
 wait = WebDriverWait(driver, 10)
 button = wait.until(EC.element_to_be_clickable((By.XPATH, '//button[.//span[text()="Ucrania"]]')))
 # Hacer clic en el botón
 button.click()
+""" Obteniendo formación de Ucrania
+obteniendo los elementos que estan dentro de la clase li cuyo atributo class contiene
+la frase "MatchLineupFormation_row__cbgug"
+"""
+formacionU = driver.find_elements(By.XPATH, '//li[contains(@class, "MatchLineupFormation_row__cbgug")]//a/p')
+# extrayendo los elementos de la lista
+jugadoresU = [element.text for element in formacionU]
 
-#%% Obteniendo formación de Rumania
-#texto1 = driver.find_element(By.XPATH,'//nav/ol/li/a[contains(text(),"Wo")]').text
-# procedemos a obtener los textos de todos los menu
-jugadores= driver.find_elements(By.XPATH,'//li/a/p')
+#%% Procedemos a dar clic en el boton correspondiente a Rumania
+wait = WebDriverWait(driver, 10)
+button = wait.until(EC.element_to_be_clickable((By.XPATH, '//button[.//span[text()="Rumania"]]')))
+# Hacer clic en el btón
+button.click()
+""" Obteniendo formación de Rumania
+obteniendo los elementos que estan dentro de la clase li cuyo atributo class contiene
+la frase "MatchLineupFormation_row__cbgug"
+"""
+formacionR = driver.find_elements(By.XPATH, '//li[contains(@class, "MatchLineupFormation_row__cbgug")]//a/p')
 # extrayendo los elementos de la lista
-menu_texts = [element.text for element in jugadores]
-# extrayendo los elementos de la lista
+jugadoresR = [element.text for element in formacionR]
+#%% Procedemos a obtener los resultados de los ultimos partidos jugados del equipo Rumania
+"""
+Obteniendo los elementos que estan dentro de la clase ul cuyo atributo class 
+contiene la frase "FormGuide_list__qSdNh"
+"""
+p_texts = [p.text for p in driver.find_elements(By.XPATH, '//ul[contains(@class, "FormGuide_list__qSdNh")]//p')]
+# Obtener los atributos alt de los elementos <img>
+img_alts = [img.get_attribute('alt') for img in driver.find_elements(By.XPATH, '//ul[contains(@class, "FormGuide_list__qSdNh")]//img')]
 
     
 
