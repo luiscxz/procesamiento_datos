@@ -142,8 +142,69 @@ ggpairs(data=iris,
 #ro.r(r_code)
 # Ejecutando el código R
 print(ro.r(r_code))
-#%% Verificando correlacione spor grupos.
+#%% Verificando correlacione por grupos.
 from scipy.stats import pearsonr
 corr_by_species = iris.groupby('Species').corr(method='pearson')
-#%%
+#%% nube de puntos para 3 columnas
+# creando objeto de nube de puntos tridimensional
+nube_3d_sin_especies = px.scatter_3d(iris,x="Sepal.Length",y="Sepal.Width",z="Petal.Length")
+# graficando al nuve de puntos
+plot(nube_3d_sin_especies)
+# creando objeto de nube de puntos tridimensional por especies
+nube_3d_con_especies = px.scatter_3d(iris,x="Sepal.Length",y="Sepal.Width",z="Petal.Length",color="Species")
+# graficando al nuve de puntos por especies
+plot(nube_3d_con_especies)
+#%% Densidades conjuntas de dos columnas (Mapa de contornos)
+# procedemos a seleccionar todas las filas que contiene la clase setosa
+setosa = iris[iris['Species']=='setosa']
+# procedemos a seleccionar todas las filas que contiene la clase virginica
+virginica = iris[iris['Species']=='virginica']
+# realizando mapa de contorno para setosa
+sns.kdeplot(data=setosa, x="Sepal.Width",y="Sepal.Length",
+            cmap="Reds",fill=True,thresh=0.5)
+# realizando mapa de contorno para virginica
+sns.kdeplot(data=virginica, x="Sepal.Width",y="Sepal.Length",
+            cmap="Oranges",fill=True,thresh=0.5)
+#%% Mapa de correlaciones
+# calculando correlaciones
+correlaciones = (iris.loc[:,~iris.columns.isin(['Species'])]).corr()
+# realizando mapa de calor
+sns.heatmap(data=correlaciones,
+            vmax=1,vmin=-1,
+            cmap="Reds",
+            linecolor="white",linewidth=0.5,
+            square=True,
+            annot=True,fmt=".2f")
+#%% Procedemos a hacer el gráfico de coordenadas paralelas
+import plotly.io as pio
+# Configura Plotly para que use png
+pio.renderers.default = 'svg'
+iris['Species_id']= iris['Species'].replace({'setosa':1,'virginica':2,'versicolor':3})
+# procedemos a establecer el orden en que queremos que aparezcan las columnas
+fig = px.parallel_coordinates(iris, color="Species_id",
+                              dimensions=['Sepal.Width', 'Sepal.Length', 'Petal.Width',
+                                          'Petal.Length'],
+                              color_continuous_scale=px.colors.diverging.Tealrose,
+                              color_continuous_midpoint=2,)
+fig.show()
 
+
+#%% graficando coordenadas paralelas con R
+r_code = '''
+library(GGally)
+library(ggplot2)
+
+ggparcoord(data = iris,
+           columns = c(1,4,3,2),
+           #alphaLines = 0.1,
+           #boxplot = TRUE,
+           groupColumn = "Species",           
+           showPoints = TRUE) +
+  scale_color_brewer(palette = "Set2") +
+  theme(panel.background = element_rect("#202020"),
+        panel.grid = element_blank(),
+        axis.title = element_blank()) 
+'''
+#ro.r(r_code)
+# Ejecutando el código R
+print(ro.r(r_code))
