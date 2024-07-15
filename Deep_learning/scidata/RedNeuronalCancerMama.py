@@ -95,3 +95,87 @@ scores = pd.DataFrame([modelo.evaluate(X_std, y)],
                       columns =modelo.metrics_names)
 # procedemos a obtener los pesos
 modelo.get_weights()
+#%% Uso del Earliy Stopping para evitar que el modelo se siga entrenando cuando ha alcanzado el error 
+# mínimo.
+from keras.callbacks import EarlyStopping
+"""
+Si llega el momento en el que hay 10 épocas seguidas y no mejoraste la métrica 'accuracy',
+entonces detente.
+"""
+earlystop = EarlyStopping(monitor='accuracy', min_delta=0.00001, patience=30,
+                          verbose=1, mode='auto')
+# procedo nuevamente a construir el modelo con el fin de aplicar Earliy Stopping
+modelo = Sequential([
+    Dense(units=5, activation='relu', input_dim=4),
+    Dense(units=1, activation='sigmoid')
+])
+# Crear una nueva instancia del optimizador
+sgd = SGD()
+# compilando modelo
+modelo.compile(loss='binary_crossentropy', optimizer=sgd, metrics=["accuracy"])
+# entrenando el modelo, es aqui donde le aplico la función Earliy Stopping
+modelo.fit(X_std, y, epochs=1000,
+           verbose=1, callbacks=[earlystop]);
+#%% Guardando modelo
+"""
+Usaremos ModelCheckpoint ya que permite guardar cada ciertas iteraciones.
+"""
+from keras.callbacks import ModelCheckpoint
+os.chdir("D:\\3. Cursos\\11. Deep learning\\modelosguardados")
+# Creando línea que guarda el modelo  asignandole el nombre "modelocancermama", 
+# Este modelo se guarda cada 10 épocas 
+checkpoint = ModelCheckpoint(filepath='modelocancermama.keras', verbose=1, save_freq=10)
+"""
+Si llega el momento en el que hay 10 épocas seguidas y no mejoraste la métrica 'accuracy',
+entonces detente.
+"""
+earlystop = EarlyStopping(monitor='accuracy', min_delta=0.00001, patience=30, verbose=1, mode='max')
+# procedo nuevamente a construir el modelo con el fin de aplicar Earliy Stopping
+modelo = Sequential([
+    Dense(units=5, activation='relu', input_dim=4),
+    Dense(units=1, activation='sigmoid')
+])
+# Crear una nueva instancia del optimizador
+sgd = SGD()
+# compilando modelo
+modelo.compile(loss='binary_crossentropy', optimizer=sgd, metrics=["acc"])
+# entrenando modelo teniendo en cuenta que guarde cada 10 epocas y pare cuando la 
+# exactitud sea mínima.
+nvo_modelo = modelo.fit(X_std, y, epochs=100,
+           verbose=1, callbacks=[checkpoint,earlystop]);
+#%% Procedemos a leer el modelo guardado
+from keras.models import load_model
+# leyendo
+modelo_recargado = load_model("modelocancermama.keras")
+# procedemos a hacer predicciones
+modelo_recargado.predict(X_std)[:5]
+#%% Realizando validación cruzada.
+""" En deep learning, en general no se suele hacer validaciones cruzadas a menos
+que el dataset sea pequeño, ya que los tiempos de entrenamiento de modelos
+y los datased suelen ser bastantes elevados. No obstante, si podemos
+permitirnoslo es aconsejable.
+"""
+from sklearn.model_selection import StratifiedKFold
+
+def generar_modelo():
+    modelo = Sequential()
+    modelo.add(Dense(units=5, activation='relu', input_dim=4))
+    modelo.add(Dense(units=1, activation='sigmoid'))
+    learning_rate = 0.01
+    sgd = SGD(learning_rate=learning_rate)
+    modelo.compile(loss="binary_crossentropy",
+              optimizer=sgd,
+              metrics=['accuracy'])
+    return modelo
+
+kfold = StratifiedKFold(n_splits=4)  # hace 4 separaciones en entrenamiento y prueba
+cvscores = []
+for train, test in kfold.split(X_std, y):
+    modelo = generar_modelo()
+    modelo.fit(X_std[train], y[train], epochs=100, verbose=0)
+    scores = modelo.evaluate(X_std[test], y[test], verbose=0)
+    cvscores.append(scores[1] )
+# procedemos a ver los resultados
+cvscores
+# promediando los resultados 
+np.mean(cvscores)
