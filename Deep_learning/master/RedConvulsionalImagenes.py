@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Jul 19 09:15:26 2024
- Ejemplo de red neuronal convulsional en Tensorflow
+ Ejemplo de red neuronal convolucional en Tensorflow
+ Librerías: 
+     TensorFlow version: 2.17.0
+     Keras version: 3.4.1
+     Matplotlib: 3.8.4
 @author: Luis A. García
 """
 # importando librerías necesarias
@@ -23,11 +27,11 @@ for i in range(25):
     plt.imshow(train_images[i], cmap=plt.cm.binary)
     plt.xlabel(class_names[train_labels[i][0]])
 plt.show()
-#%% Construccion de la red neuronal convulsional simple
+#%% Construcción de la red neuronal convolucional simple
 # creando modelo secuencial
 model = models.Sequential()
-""" Creando capa convulsional 2D para realizar operaciones de convulsión en 
-    2 dimensiones. Es útil para procesar imagenes.
+""" Creando capa convolucional 2D para realizar operaciones de convolución en 
+    2 dimensiones. Es útil para procesar imágenes.
     Esta capa contiene:
         •	32 filtros o kernels
         •	El tamaño de cada filtro es de 3x3 píxeles 
@@ -38,20 +42,20 @@ model = models.Sequential()
 model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(32, 32, 3))) 
 """ Agregando capa al modelo que ayuda a reducir el tamaño de las imagenes 
     de la siguiente forma:
-        •	MaxPooling2D es la capa que toma la imagen y la hace mas pequeña.
+        •	MaxPooling2D es la capa que toma la imagen y la hace más pequeña.
         •	(2, 2) Se divide la imagen en pequeños bloques de 2x2 píxeles.
         •	Se encuentra el valor más alto en cada bloque
-        •	Se crea la imágen más pequeña usando esos valores mas alto
-En resumen: La función max-poolingSe utiliza para reducir la dimensionalidad de 
+        •	Se crea la imagen más pequeña usando esos valores más alto
+En resumen: La función max-pooling se utiliza para reducir la dimensionalidad de 
 los mapas de características (outputs de las capas convolucionales) y para 
 destacar las características más importantes.
 """
 model.add(layers.MaxPooling2D((2, 2)))
-# creando segunda capa convulsional 2D con activación RELU
+# creando segunda capa convolucional 2D con activación RELU
 model.add(layers.Conv2D(64, (3, 3), activation='relu'))
-# añadiendo capara para reducir dimensionalidad de las imágenes quedándonos con las características más importantes
+# añadiendo capa para reducir dimensionalidad de las imágenes quedándonos con las características más importantes
 model.add(layers.MaxPooling2D((2, 2)))
-#creando tercera capa convulsional 2D con activación RELU
+#creando tercera capa convolucional 2D con activación RELU
 model.add(layers.Conv2D(64, (3, 3), activation='relu'))
 #-----------------------------------------------------------------------------#
 # Añadiendo capas densas que usan los features para clasificar las imágenes
@@ -65,7 +69,7 @@ model.add(layers.Dense(10))
 model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=['accuracy'])
-# entranando modelo en 10 épocas
+# entrenando modelo en 10 épocas
 history = model.fit(train_images, train_labels, epochs=10, 
                     validation_data=(test_images, test_labels))
 #%% Evaluando el modelo para ver el desempeño en el conjunto de prueba
