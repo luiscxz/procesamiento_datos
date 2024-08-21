@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 Created on Tue Jul 30 12:52:18 2024
-Identificación de coches (en video.mp4) meiante modelo YOLO
+Identificación de coches (en video.mp4) mediante modelo YOLO
 Comandos de instalación:
     conda install pytorch::pytorch
     conda install -c conda-forge ultralytics
